@@ -27,17 +27,47 @@ namespace DataScrapingService.Services
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
 
-            var nodes = htmlDocument.DocumentNode.SelectNodes(XPaths.HeadlineXPath);
-
             var xmlDoc = new XmlDocument();
             var root = xmlDoc.CreateElement("root");
             xmlDoc.AppendChild(root);
 
-            foreach (var node in nodes)
+            foreach (var node in htmlDocument.DocumentNode.SelectNodes(XPaths.VehicleCardXPath))
             {
-                var element = xmlDoc.CreateElement("h1");
-                element.InnerText = node.InnerText;
-                root.AppendChild(element);
+                var vehicleElement = xmlDoc.CreateElement("vehicle");
+
+                var titleNode = node.SelectSingleNode(XPaths.TitleXPath);
+                if (titleNode != null)
+                {
+                    var titleElement = xmlDoc.CreateElement("title");
+                    titleElement.InnerText = titleNode.InnerText;
+                    vehicleElement.AppendChild(titleElement);
+                }
+
+                var priceNode = node.SelectSingleNode(XPaths.PriceXPath);
+                if (priceNode != null)
+                {
+                    var priceElement = xmlDoc.CreateElement("price");
+                    priceElement.InnerText = priceNode.InnerText;
+                    vehicleElement.AppendChild(priceElement);
+                }
+
+                var mediaNode = node.SelectSingleNode(XPaths.MediaXPath);
+                if (mediaNode != null)
+                {
+                    var mediaElement = xmlDoc.CreateElement("media");
+                    mediaElement.InnerText = mediaNode.InnerText;
+                    vehicleElement.AppendChild(mediaElement);
+                }
+
+                var footerNode = node.SelectSingleNode(XPaths.FooterXPath);
+                if (footerNode != null)
+                {
+                    var footerElement = xmlDoc.CreateElement("footer");
+                    footerElement.InnerText = footerNode.InnerText;
+                    vehicleElement.AppendChild(footerElement);
+                }
+
+                root.AppendChild(vehicleElement);
             }
 
             var xslt = new XslCompiledTransform();
